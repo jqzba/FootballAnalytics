@@ -5,7 +5,7 @@ import itertools
 
 played = 39
 
-loc = "C:/Users/User/Documents/Data/"
+loc = "C:/Users/Enspa/Documents/GitHub/FootballAnalytics/"
 
 epl_1920 = pd.read_csv("https://www.football-data.co.uk/mmz4281/1920/E0.csv")
 
