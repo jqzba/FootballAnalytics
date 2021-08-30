@@ -5,7 +5,7 @@ import itertools
 
 played = 39
 
-loc = "C:/Users/Enspa/Documents/GitHub/FootballAnalytics/"
+loc = "C:/Users/User/Documents/GitHub/FootballAnalytics"
 
 epl_1920 = pd.read_csv("https://www.football-data.co.uk/mmz4281/1920/E0.csv")
 
@@ -16,6 +16,9 @@ epl_1920 = epl_1920.rename(columns={'FTHG': 'HomeGoals', 'FTAG': 'AwayGoals'})
 data = pd.read_csv("https://www.football-data.co.uk/mmz4281/1920/E0.csv")
 data2021 = pd.read_csv("https://www.football-data.co.uk/mmz4281/2021/E0.csv")
 data1819 = pd.read_csv("https://www.football-data.co.uk/mmz4281/1819/E0.csv")
+
+
+
 
 # Gets the goals scored agg arranged by teams and matchweek
 def get_goals_scored(playing_stat):
@@ -94,6 +97,7 @@ def get_gss(playing_stat):
 game_stats1819 = get_gss(data1819)
 game_stats1920 = get_gss(data)
 game_stats2021 = get_gss(data2021)
+
 def get_points(result):
     if result == 'W':
         return 3
@@ -212,6 +216,7 @@ playing_statistics_1819 = add_form_df(game_stats1819)
 
 print("jee", playing_statistics_2021)
 
+
 def form_points(stats) -> object:
     j = 10
     ht_form_points = []
@@ -303,6 +308,38 @@ game_stats1920 = get_mw(game_stats1920)
 game_stats2021 = get_mw(game_stats2021)
 
 
+#gets avg xG(expected goals) data
+metrics_data = pd.read_csv("C:/Users/User/Documents/Data/understat.com.csv")
+def add_avg_xG(stats, metrics_data):
+    year = 2018
+    league = "EPL"
+    epl_metrics = metrics_data[metrics_data["league"] == league]
+    epl_metrics = epl_metrics[epl_metrics["year"] == year]
+
+    HT_xG = []
+    AT_xG = []
+    j = 0
+    for i in range(0, len(stats)):
+        homeTeam = stats.iloc[i].HomeTeam
+        awayTeam = stats.iloc[i].AwayTeam
+
+        HTxG = epl_metrics[epl_metrics["team"] == homeTeam]
+        HTxg = HTxG.xG / 38
+        HT_xG.append(HTxg)
+
+        ATxG = epl_metrics[epl_metrics["team"] == awayTeam]
+        ATxg = ATxG.xG / 38
+        AT_xG.append(ATxg)
+
+    stats['HTxG'] = HT_xG
+    stats['ATxG'] = AT_xG
+
+
+
+
+game_stats1819 = add_avg_xG(game_stats1819, metrics_data)
+
+
 
 full_stats = pd.concat([game_stats1819, game_stats1920, game_stats2021], ignore_index= True)
 
@@ -340,14 +377,41 @@ playing_stat['ATGD'] = playing_stat['ATGS'] - playing_stat['ATGC']
 playing_stat['DiffPts'] = playing_stat['HTP'] - playing_stat['ATP']
 playing_stat['DiffFormPts'] = playing_stat['HTFP'] - playing_stat['ATFP']
 
-# Scale DiffPts , DiffFormPts, HTGD, ATGD by Matchweek.
-cols = ['HTGD','ATGD','DiffPts','DiffFormPts','HTP','ATP']
+# Scale DiffPts , HTGD, ATGD by Matchweek.
+cols = ['HTGD','ATGD','DiffPts','HTP','ATP']
 playing_stat.MaW = playing_stat.MaW.astype(float)
 
 for col in cols:
-    playing_stat[col] = playing_stat[col] / playing_stat.MaW
+    playing_stat[col] = playing_stat[col] / (playing_stat.MaW - 1)
 
 playing_stat_test = playing_stat[1100:]
 print(playing_stat_test)
 
-playing_stat.to_csv(loc + "final_dataset.csv")
+##playing_stat.to_csv(loc + "/final_dataset_v1.csv")
+
+'''
+German_2021 = pd.read_csv("https://www.football-data.co.uk/mmz4281/2021/D1.csv")
+german_1920 = pd.read_csv("https://www.football-data.co.uk/mmz4281/1920/D1.csv")
+german_1819 = pd.read_csv("https://www.football-data.co.uk/mmz4281/1819/D1.csv")
+
+full_german = pd.concat([german_1819, german_1920, German_2021], ignore_index=True)
+
+German_before = full_german[:515]
+german_covid = full_german[516:]
+
+bef_matches = German_before.shape[0]
+bef_homewins = len(German_before[German_before.FTR == 'H'])
+
+covid_matches = german_covid.shape[0]
+covid_homewins = len(german_covid[german_covid.FTR == 'H'])
+
+bef_win_rate = (float(bef_homewins)/bef_matches * 100)
+win_rate = (float(covid_homewins)/covid_matches * 100)
+
+print("Covid time home winrate: ", win_rate)
+print("Before covid home winrate: ", bef_win_rate)
+
+loc = "C:/Users/User/Documents/GitHub/FootballAnalytics/"
+
+full_german.to_csv(loc + "german_full.csv")
+'''

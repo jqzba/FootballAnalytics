@@ -14,7 +14,7 @@ from sklearn.metrics import f1_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
 
-loc = "C:/Users/Enspa/Documents/GitHub/FootballAnalytics/"
+loc = "C:/Users/User/Documents/GitHub/FootballAnalytics/"
 data = pd.read_csv(loc + "final_dataset.csv")
 
 data_before = data[:667]
@@ -31,12 +31,19 @@ win_rate = (float(n_homewins) / (n_matches)) * 100
 
 bef_win_rate = (float(bef_n_homewins)/ (before_n_matches) * 100)
 
+
+
 print("Covid time home winrate: ", win_rate)
 print("Before covid home winrate: ", bef_win_rate)
 
+
+data_top = data.head()
+for col in data.columns:
+    print(col)
+
 df = data[['HTGD','ATGD','HTP','ATP','DiffFormPts']]
 ts = pd.plotting.scatter_matrix(df, figsize=(10,10))
-##plt.show()
+plt.show()
 
 
 print(win_rate/bef_win_rate)
@@ -47,7 +54,7 @@ test_data = data[1001:]
 x_all = data.drop(['FTR'],1)
 y_all = data['FTR']
 
-print(list(x_all.columns))
+##print(list(x_all.columns))
 
 
 cols = [['HTGD','ATGD','HTP','ATP']]
@@ -87,7 +94,7 @@ print(display(x_all.tail()))
 
 X_train, X_test, y_train, y_test = train_test_split(x_all, y_all,
                                                     test_size = 100,
-                                                    shuffle = False)
+                                                    shuffle = True)
 
 
 def predict_labels(clf, features, target):
@@ -126,4 +133,30 @@ clf_A = LogisticRegression(random_state=42)
 predict(clf_gnb, X_train, y_train, X_test, y_test)
 print('')
 predict(clf_A, X_train, y_train, X_test, y_test)
+
+from collections import OrderedDict
+
+new_data = OrderedDict([
+    ('HTP', 0),
+    ('ATP', 0),
+    ('HM1', "W"),
+    ('HM2', "D"),
+    ('AM1', "L"),
+    ('AM2', "W"),
+    ('HTFP', 11),
+    ('ATFP', 9),
+    ('HTStreak', 0),
+    ('ATStreak', 0),
+    ('HTGD', 0.8),
+    ('ATGD', 7/5),
+    ('DiffPts', 0),
+    ('DiffFormPts', 0.8-7/5)]
+)
+
+
+new_data = [{'HTP': }]
+print(new_data)
+
+
+print(clf_A.predict(new_data))
 
